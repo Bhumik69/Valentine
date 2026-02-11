@@ -5,7 +5,6 @@ import surpriseBoxAsset from "../../assets/surprise.png";
 type FutureScrapbookProps = {
   onBack?: () => void;
   onContinue?: () => void;
-  paymentSuccessImage?: string;
 };
 
 type Pos = { x: number; y: number };
@@ -21,7 +20,6 @@ function clamp(n: number, a: number, b: number) {
 export default function FutureScrapbook({
   onBack,
   onContinue,
-  paymentSuccessImage,
 }: FutureScrapbookProps) {
   const TARGET_SCORE = 10;
   const MOVE_MS = 1000;
