@@ -2,71 +2,124 @@
 @tailwind components;
 @tailwind utilities;
 
-/* :root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+/* -------------------------------------------------
+   Responsive foundation (works with Tailwind)
+   Goal: make "25% zoom look" become normal at 100%
+-------------------------------------------------- */
+
+@layer base {
+  :root {
+    /* Container */
+    --container-max: 1100px;
+    --container-pad: clamp(16px, 4vw, 32px);
+
+    /* Spacing scale */
+    --space-1: clamp(6px, 0.7vw, 10px);
+    --space-2: clamp(10px, 1.1vw, 16px);
+    --space-3: clamp(14px, 1.6vw, 22px);
+    --space-4: clamp(18px, 2.2vw, 30px);
+    --space-5: clamp(24px, 3vw, 44px);
+
+    /* Typography scale */
+    --text-xs: clamp(12px, 0.9vw, 13px);
+    --text-sm: clamp(13px, 1.1vw, 15px);
+    --text-md: clamp(14px, 1.2vw, 18px);
+    --text-lg: clamp(18px, 1.6vw, 22px);
+    --text-xl: clamp(22px, 2.2vw, 30px);
+    --text-2xl: clamp(28px, 3vw, 40px);
+
+    /* Tap target */
+    --tap: 44px;
+
+    /* Safer default radius */
+    --radius-md: 14px;
+    --radius-lg: 20px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden; /* prevents accidental horizontal scroll */
+  }
+
+  body {
+    margin: 0;
+    font-size: var(--text-md);
     line-height: 1.5;
-    font-weight: 400;
-
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
-
-    font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Media defaults */
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Text overflow safety */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  a,
+  span,
+  div {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* Tap target + consistent fonts */
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Accessible focus */
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
 }
 
-a {
-    font-weight: 500;
-    color: #646cff;
-    text-decoration: inherit;
-}
-a:hover {
-    color: #535bf2;
+@layer components {
+  /* Reusable fluid container (use: class="container") */
+  .container {
+    width: min(100%, var(--container-max));
+    margin-inline: auto;
+    padding-inline: var(--container-pad);
+  }
+
+  /* Optional: easy vertical section padding */
+  .section {
+    padding-block: var(--space-5);
+  }
 }
 
-body {
-    margin: 0;
-    display: flex;
-    place-items: center;
-    min-width: 320px;
-    min-height: 100vh;
+/* Extra safety: if some element still forces overflow */
+@media (max-width: 480px) {
+  * {
+    max-width: 100%;
+  }
 }
-
-h1 {
-    font-size: 3.2em;
-    line-height: 1.1;
-}
-
-button {
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    background-color: #1a1a1a;
-    cursor: pointer;
-    transition: border-color 0.25s;
-}
-button:hover {
-    border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-    :root {
-        color: #213547;
-        background-color: #ffffff;
-    }
-    a:hover {
-        color: #747bff;
-    }
-    button {
-        background-color: #f9f9f9;
-    }
-} */

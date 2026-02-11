@@ -1,3 +1,12 @@
+/* =========================================================
+   GIFTWALL — FULLY FLUID (EVERY PIXEL), NO SCROLL, 3 CARDS ALWAYS VISIBLE
+   - Title always top, Hint always bottom
+   - Cards ALWAYS all 3 visible (no scrolling)
+   - Responds to width-only OR height-only changes
+   - Uses fluid sizing and container queries
+   ========================================================= */
+
+/* -------- Local reset -------- */
 *,
 *::before,
 *::after {
@@ -7,909 +16,296 @@
 html,
 body,
 #root {
-  width: 100%;
-  height: 100%;
+  inline-size: 100%;
+  block-size: 100%;
   margin: 0;
   padding: 0;
+}
+
+/* If your whole site is single-screen, keep it.
+   If other pages need scroll, remove from global and keep per-page. */
+body {
   overflow: hidden;
-  overscroll-behavior: none;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  -webkit-tap-highlight-color: transparent;
 }
 
 img,
-video,
-canvas,
 svg,
-iframe {
-  max-width: 100%;
-  height: auto;
+video,
+canvas {
+  max-inline-size: 100%;
+  block-size: auto;
   display: block;
 }
 
-/* Page wrapper */
+/* =========================================================
+   Page wrapper (locks to viewport, no scroll)
+   ========================================================= */
 .giftwall {
-  min-height: 100dvh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: clamp(18px, 2dvh, 48px) clamp(12px, 1.5vw, 16px);
-  padding-top: clamp(70px, 5dvh, 120px);
-  position: relative;
+  position: fixed;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100svh;
   overflow: hidden;
+
+  display: grid;
+  place-items: center;
+
   background: radial-gradient(1200px 700px at 50% 0%, #ffe8ef 0%, #fff 70%);
 }
 
-/* hearts confetti overlay */
-.giftwall::before {
-  content: "";
-  position: absolute;
-  inset: -20%;
-  pointer-events: none;
-  opacity: 0.5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none'%3E%3Cpath d='M36 46c-6-10-20-7-22 4-2 12 11 18 22 28 11-10 24-16 22-28-2-11-16-14-22-4z' fill='%23ff6a8a' fill-opacity='.35'/%3E%3Cpath d='M190 58c-5-9-18-7-20 3-2 11 10 16 20 25 10-9 22-14 20-25-2-10-15-12-20-3z' fill='%23ff6a8a' fill-opacity='.22'/%3E%3Cpath d='M78 178c-5-9-18-7-20 3-2 11 10 16 20 25 10-9 22-14 20-25-2-10-15-12-20-3z' fill='%23ff6a8a' fill-opacity='.28'/%3E%3Cpath d='M150 150c-6-10-20-7-22 4-2 12 11 18 22 28 11-10 24-16 22-28-2-11-16-14-22-4z' fill='%23ff6a8a' fill-opacity='.18'/%3E%3C/g%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 220px 220px;
-  filter: blur(0.2px);
-}
-
+/* =========================================================
+   Inner layout: Title / Cards / Hint
+   Container query makes it adapt to every pixel change
+   ========================================================= */
 .giftwall__inner {
-  width: min(980px, 100%);
-  text-align: center;
-  position: relative;
-  z-index: 1;
-  max-height: calc(100dvh - clamp(18px, 2dvh, 48px) * 2);
-}
+  /* a stable readable max width, but always fits */
+  inline-size: min(1120px, 100%);
+  block-size: 100%;
 
-.giftwall__title {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  font-weight: 800;
-  letter-spacing: 1px;
-  margin: 0 0 clamp(14px, 1.2dvh, 28px) 0;
-  color: #e34d79;
-  font-size: clamp(26px, 5.6vw, 56px);
-  line-height: 1.05;
-}
+  /* fluid padding responds to BOTH width and height using vmin */
+  --pad: clamp(12px, 2.6vmin, 38px);
+  padding: var(--pad);
 
-.giftwall__hint {
-  margin: clamp(12px, 1.2dvh, 28px) 0 0 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  color: #e34d79;
-  font-size: clamp(14px, 2.2vw, 26px);
-}
-
-/* Desktop gifts row */
-.giftwall__gifts {
+  /* 3-row grid: title / cards / hint */
   display: grid;
-  gap: clamp(14px, 1.6dvh, 24px);
-  grid-template-columns: 1fr;
-  justify-items: center;
-  width: 100%;
-  max-width: 840px;
-  margin-inline: auto;
-  max-height: calc(100dvh - clamp(70px, 5dvh, 120px) - clamp(18px, 2dvh, 48px) * 2 - 140px);
+  grid-template-rows: auto 1fr auto;
+
+  /* fluid gap responds to height changes too */
+  --gap: clamp(10px, 1.8vmin, 22px);
+  row-gap: var(--gap);
+
+  /* critical: prevents children from forcing overflow */
+  min-block-size: 0;
+
+  /* Container query */
+  container-type: inline-size;
+  container-name: giftwall;
 }
 
+/* =========================================================
+   Title (top)
+   ========================================================= */
+.giftwall__title {
+  margin: 0;
+  text-align: center;
+  color: #e34d79;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.05;
+
+  /* font reacts to width + height */
+  font-size: clamp(20px, 3.2vmin, 56px);
+}
+
+/* =========================================================
+   Hint (bottom)
+   ========================================================= */
+.giftwall__hint {
+  margin: 0;
+  text-align: center;
+  color: #e34d79;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+
+  font-size: clamp(12px, 1.8vmin, 20px);
+}
+
+/* =========================================================
+   Cards area (middle)
+   Must ALWAYS show 3 cards.
+   ========================================================= */
+.giftwall__gifts {
+  min-block-size: 0;
+
+  /* We use grid because it can adapt to height-only changes better than flex */
+  display: grid;
+
+  /* Fluid spacing that responds to height + width */
+  gap: clamp(10px, 1.7vmin, 22px);
+
+  /* Default: 1 column, 3 rows (best on tall screens) */
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, 1fr);
+
+  /* center nicely */
+  align-items: stretch;
+  justify-items: center;
+}
+
+/* =========================================================
+   Smart auto-layout using container queries
+   - If there's enough width, do 3 columns (1 row)
+   - If medium, do 2 columns + 1 below (2 rows)
+   This is continuous: as width changes by 1px it can switch.
+   ========================================================= */
+
+/* Wider containers → 3 in a row */
+@container giftwall (min-width: 860px) {
+  .giftwall__gifts {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr;
+    align-items: center;
+  }
+}
+
+/* Medium width → 2 on top, 1 centered below */
+@container giftwall (min-width: 560px) and (max-width: 859px) {
+  .giftwall__gifts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  /* third card spans both columns */
+  .giftwall__gifts .giftcard:nth-child(3) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-inline-size: min(520px, 100%);
+  }
+}
+
+/* =========================================================
+   Card button — scales to available space automatically
+   ========================================================= */
 .giftcard {
-  width: 100%;
-  max-width: 680px;
   border: none;
   background: transparent;
   padding: 0;
   cursor: pointer;
   position: relative;
+
+  /* Must be shrinkable to avoid overflow */
+  min-inline-size: 0;
+  min-block-size: 0;
+
+  /* Let grid decide the box size, but cap it */
+  inline-size: 100%;
+  max-inline-size: clamp(220px, 32vmin, 420px);
+
+  /* To guarantee "no scroll", card height adapts with available space */
+  block-size: 100%;
+
+  border-radius: clamp(16px, 2.2vmin, 26px);
 }
 
+/* =========================================================
+   The SVG art is the "card face"
+   KEY: use aspect-ratio so height follows width AND can shrink by height.
+   ========================================================= */
+.giftart {
+  inline-size: 100%;
+  block-size: auto;
+
+  /* makes card scale perfectly */
+  aspect-ratio: 260 / 180;
+
+  border-radius: clamp(16px, 2.2vmin, 26px);
+  padding: clamp(10px, 1.8vmin, 22px);
+
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 20px 55px rgba(255, 80, 130, 0.15);
+  backdrop-filter: blur(6px);
+
+  color: #ff4f77;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+/* hover only on real mouse */
+@media (hover: hover) and (pointer: fine) {
+  .giftcard:hover .giftart {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 26px 75px rgba(255, 80, 130, 0.18);
+  }
+}
+
+/* =========================================================
+   Tag: stays readable but never breaks layout
+   ========================================================= */
 .giftcard__tag {
   position: absolute;
   left: 50%;
   top: 64%;
   transform: translate(-50%, -50%);
+
   background: rgba(255, 255, 255, 0.92);
   border: 2px solid rgba(242, 201, 212, 0.9);
-  color: #c84a6b;
-  font-weight: 800;
-  padding: clamp(6px, 0.9dvh, 8px) clamp(10px, 1.4vw, 14px);
   border-radius: 999px;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  box-shadow: 0 12px 28px rgba(255, 80, 130, 0.12);
-  font-size: clamp(12px, 1.6vw, 16px);
-}
 
-.giftart {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: clamp(16px, 2.4vw, 26px);
-  padding: clamp(10px, 1.2vw, 14px);
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 22px 50px rgba(255, 80, 130, 0.14);
-  backdrop-filter: blur(6px);
-  overflow: hidden;
-  transition: transform 180ms ease, box-shadow 180ms ease;
-  color: #ff4f77;
-}
+  padding: clamp(6px, 1.2vmin, 10px) clamp(10px, 2vmin, 18px);
 
-@media (hover: hover) and (pointer: fine) {
-  .giftcard:hover .giftart {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 28px 70px rgba(255, 80, 130, 0.18);
-  }
-}
-
-/* Modal */
-.giftmodal {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 10, 15, 0.45);
-  display: grid;
-  place-items: center;
-  padding: clamp(10px, 2vw, 18px);
-  z-index: 9999;
-  overflow: hidden;
-}
-
-.giftmodal__panel {
-  width: min(520px, 100%);
-  background: white;
-  border-radius: clamp(16px, 2vw, 22px);
-  padding: clamp(12px, 1.6vw, 18px);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(242, 201, 212, 0.8);
-  max-height: 92dvh;
-  overflow: hidden;
-}
-
-.giftmodal__header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.giftmodal__badge {
-  width: clamp(36px, 6vw, 44px);
-  height: clamp(36px, 6vw, 44px);
-  display: grid;
-  place-items: center;
-  border-radius: 14px;
-  background: #ffe8ef;
-  font-size: clamp(18px, 3vw, 22px);
-}
-
-.giftmodal__title {
-  margin: 0;
-  font-size: clamp(16px, 2.4vw, 20px);
-  color: #c84a6b;
   font-weight: 900;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  line-height: 1.1;
-}
-
-.giftmodal__sub {
-  margin: 2px 0 0 0;
-  color: #7a5460;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  font-size: clamp(12px, 1.8vw, 14px);
-  line-height: 1.2;
-}
-
-.giftmodal__body {
-  padding: clamp(10px, 1.4vw, 14px) clamp(10px, 1.4vw, 12px);
-  border-radius: 16px;
-  background: #fff6f8;
-  border: 1px solid rgba(242, 201, 212, 0.8);
-  font-size: clamp(13px, 2.2vw, 16px);
-  color: #3f2a32;
-  line-height: 1.45;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  max-height: 56dvh;
-  overflow: hidden;
-}
-
-.giftmodal__close {
-  margin-top: clamp(10px, 1.4vw, 14px);
-  width: 100%;
-  border: none;
-  background: #ff4f77;
-  color: white;
-  font-weight: 900;
-  padding: clamp(10px, 1.4vw, 12px) clamp(12px, 1.6vw, 14px);
-  border-radius: 14px;
-  cursor: pointer;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-}
-
-/* Gift "page" view (no URL change) */
-.giftpage {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  --letter-scale: 1.5;
-}
-
-.giftpage__inner {
-  width: min(980px, 100%);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(242, 201, 212, 0.8);
-  border-radius: clamp(18px, 2.6vw, 26px);
-  padding: clamp(14px, 2vw, 24px);
-  box-shadow: 0 28px 70px rgba(255, 80, 130, 0.16);
-  text-align: left;
-  position: relative;
-  max-height: calc(100dvh - clamp(70px, 5dvh, 120px) - clamp(18px, 2dvh, 48px) * 2);
-  overflow: hidden;
-}
-
-.giftpage__back {
-  border: none;
-  background: #ffe8ef;
   color: #c84a6b;
-  font-weight: 800;
-  padding: clamp(8px, 1.2vw, 10px) clamp(10px, 1.6vw, 14px);
-  border-radius: 999px;
-  cursor: pointer;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  font-size: clamp(12px, 1.8vw, 14px);
-}
+  letter-spacing: 0.02em;
 
-.letter-back {
-  position: absolute;
-  right: clamp(12px, 2vw, 28px);
-  bottom: clamp(12px, 2vw, 26px);
-  padding: clamp(8px, 1.2vw, 10px) clamp(12px, 2vw, 18px);
-  background: #ffc3d2;
-  color: #ffffff;
-  box-shadow: 0 12px 26px rgba(255, 120, 160, 0.3);
-  z-index: 5;
-}
+  font-size: clamp(12px, 1.6vmin, 16px);
 
-.giftpage__header {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  margin-top: clamp(10px, 1.6dvh, 18px);
-  margin-bottom: clamp(10px, 1.4dvh, 16px);
-}
+  box-shadow: 0 10px 22px rgba(255, 80, 130, 0.14);
 
-.giftpage__badge {
-  width: clamp(40px, 6vw, 52px);
-  height: clamp(40px, 6vw, 52px);
-  display: grid;
-  place-items: center;
-  border-radius: 16px;
-  background: #ffe8ef;
-  font-size: clamp(20px, 3.2vw, 26px);
-}
-
-.giftpage__title {
-  margin: 0;
-  font-size: clamp(18px, 2.6vw, 24px);
-  color: #c84a6b;
-  font-weight: 900;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  line-height: 1.1;
-}
-
-.giftpage__sub {
-  margin: 4px 0 0 0;
-  color: #7a5460;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  font-size: clamp(12px, 1.8vw, 14px);
-  line-height: 1.2;
-}
-
-.giftpage__body {
-  padding: clamp(12px, 1.8vw, 18px) clamp(12px, 1.8vw, 16px);
-  border-radius: 18px;
-  background: #fff6f8;
-  border: 1px solid rgba(242, 201, 212, 0.8);
-  font-size: clamp(14px, 2.4vw, 18px);
-  color: #3f2a32;
-  line-height: 1.55;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  max-height: 58dvh;
-  overflow: hidden;
-}
-
-.giftpage__paragraph {
-  margin: 0 0 12px 0;
-}
-
-.giftpage__spacer {
-  display: block;
-  height: 10px;
-}
-
-.giftpage__art {
-  margin-top: clamp(10px, 1.6dvh, 18px);
-}
-
-.giftpage__art .giftart {
-  max-width: 520px;
-  margin-inline: auto;
-}
-
-/* Love letter scene */
-.letter-scene {
-  position: relative;
-  width: min(960px, 90vw);
-  margin: 14px auto 10px;
-  padding: clamp(42px, 4.2dvh, 70px) clamp(18px, 3.2vw, 40px) clamp(64px, 6dvh, 100px);
-  border-radius: 30px;
-  background:
-    radial-gradient(1000px 500px at 50% 0%, rgba(255, 230, 239, 0.95), rgba(255, 255, 255, 0.9)),
-    repeating-radial-gradient(circle at 20% 20%, rgba(255, 200, 215, 0.25) 0 4px, transparent 4px 18px);
-  overflow: hidden;
-  transform: scale(var(--letter-scale));
-  transform-origin: top center;
-  max-height: 72dvh;
-}
-
-.letter-hearts .heart {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  background: #ff7d9a;
-  transform: rotate(45deg);
-  border-radius: 4px;
-  opacity: 0.6;
-}
-
-.letter-hearts .heart::before,
-.letter-hearts .heart::after {
-  content: "";
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  background: #ff7d9a;
-  border-radius: 50%;
-}
-
-.letter-hearts .heart::before {
-  top: -8px;
-  left: 0;
-}
-
-.letter-hearts .heart::after {
-  left: -8px;
-  top: 0;
-}
-
-.heart--1 {
-  top: 28px;
-  left: 60px;
-}
-
-.heart--2 {
-  top: 42px;
-  right: 80px;
-  transform: rotate(45deg) scale(0.8);
-}
-
-.heart--3 {
-  top: 140px;
-  right: 40px;
-  transform: rotate(45deg) scale(0.7);
-}
-
-.heart--4 {
-  bottom: 140px;
-  left: 40px;
-  transform: rotate(45deg) scale(0.9);
-}
-
-.heart--5 {
-  bottom: 60px;
-  right: 120px;
-  transform: rotate(45deg) scale(0.75);
-}
-
-.letter-bubbles {
-  position: absolute;
-  top: 28px;
-  left: 300px;
-  display: grid;
-  gap: 10px;
-  transform: rotate(-4deg);
-  max-width: calc(100% - 320px);
-}
-
-.photo-sticker {
-  position: absolute;
-  top: 60px;
-  right: 70px;
-  width: 120px;
-  height: 90px;
-  background:
-    linear-gradient(140deg, rgba(255, 210, 180, 0.9), rgba(255, 255, 255, 0.7)),
-    radial-gradient(circle at 30% 30%, rgba(200, 150, 120, 0.4), transparent 60%);
-  border-radius: 8px;
-  border: 6px solid #fff7f0;
-  box-shadow: 0 12px 26px rgba(80, 50, 70, 0.2);
-  transform: rotate(6deg);
-}
-
-.bubble {
+  /* tap target */
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(8px, 1.2vw, 10px) clamp(12px, 1.8vw, 16px);
-  border-radius: 16px;
-  background: #f8f1ff;
-  border: 2px solid #8f6ad8;
-  color: #7a4fc2;
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  position: relative;
-  font-size: clamp(12px, 1.8vw, 14px);
-  line-height: 1.1;
+
+  white-space: nowrap;
 }
 
-.bubble::after {
-  content: "";
-  position: absolute;
-  bottom: -8px;
-  left: 16px;
-  width: 14px;
-  height: 14px;
-  background: #f8f1ff;
-  border-left: 2px solid #8f6ad8;
-  border-bottom: 2px solid #8f6ad8;
-  transform: rotate(45deg);
-}
-
-.bubble--hearts {
-  font-size: 12px;
-  letter-spacing: 3px;
-}
-
-.letter-polaroids {
-  position: absolute;
-  left: 24px;
-  top: 150px;
-  display: grid;
-  gap: 18px;
-  max-width: 42%;
-}
-
-.polaroid {
-  position: relative;
-  background: #fffafc;
-  border-radius: 10px;
-  padding: 12px 12px 24px;
-  width: 190px;
-  box-shadow: 0 18px 40px rgba(80, 50, 70, 0.2);
-  transform: rotate(-6deg);
-}
-
-.polaroid--small {
-  width: 150px;
-  transform: rotate(-12deg);
-}
-
-.polaroid__photo {
-  height: 130px;
-  border-radius: 6px;
-  background:
-    linear-gradient(140deg, rgba(255, 214, 226, 0.9), rgba(255, 255, 255, 0.6)),
-    radial-gradient(circle at 30% 30%, rgba(255, 180, 200, 0.6), transparent 60%);
-}
-
-.polaroid__photo--soft {
-  height: 108px;
-}
-
-.polaroid__caption {
-  margin-top: 8px;
-  text-align: center;
-  font-size: 12px;
-  color: #8f6a78;
-  font-weight: 700;
-}
-
-.polaroid__tape {
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  width: 56px;
-  height: 16px;
-  background: rgba(242, 201, 212, 0.85);
-  border-radius: 6px;
-  transform: translateX(-50%) rotate(-4deg);
-  box-shadow: 0 6px 14px rgba(80, 50, 70, 0.18);
-}
-
-.letter-envelope {
-  position: relative;
-  width: min(600px, 90%);
-  margin: 0 auto;
-}
-
-.letter-paper {
-  position: relative;
-  z-index: 2;
-  background: #fff9fa;
-  border-radius: 22px;
-  padding: clamp(22px, 3.2dvh, 34px) clamp(18px, 3vw, 38px) clamp(52px, 6dvh, 80px);
-  box-shadow: 0 24px 50px rgba(80, 50, 70, 0.18);
-  text-align: center;
-  border: 1px solid rgba(242, 201, 212, 0.8);
-}
-
-.letter-title {
-  font-size: clamp(18px, 3vw, 28px);
-  margin-bottom: clamp(8px, 1.6dvh, 14px);
-  color: #4b3b45;
-  font-weight: 700;
-  font-family: "Segoe Script", "Bradley Hand", "Comic Sans MS", "Segoe UI", sans-serif;
-  line-height: 1.1;
-}
-
-.letter-text {
-  font-size: clamp(13px, 2.2vw, 18px);
-  line-height: 1.55;
-  color: #4b3b45;
-  font-family: "Segoe Script", "Bradley Hand", "Comic Sans MS", "Segoe UI", sans-serif;
-}
-
-.letter-text p {
-  margin: 0 0 10px 0;
-}
-
-.letter-gap {
-  display: block;
-  height: 10px;
-}
-
-.envelope {
-  position: relative;
-  width: 100%;
-  height: clamp(150px, 10dvh, 240px);
-  margin-top: clamp(-44px, -2.4dvh, -56px);
-}
-
-.envelope__back {
-  position: absolute;
-  inset: 0;
-  border-radius: 0 0 28px 28px;
-  background: linear-gradient(135deg, #7da8ff, #8fb8ff);
-}
-
-.envelope__front {
-  position: absolute;
-  inset: 0;
-  border-radius: 0 0 28px 28px;
-  background: linear-gradient(135deg, #6d9dff, #88b3ff);
-  clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
-}
-
-.envelope__flap {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 60%;
-  background: linear-gradient(180deg, #a6c3ff, #88b3ff);
-  clip-path: polygon(0 0, 50% 80%, 100% 0, 100% 0, 0 0);
-}
-
-.envelope__heart {
-  position: absolute;
-  left: 50%;
-  top: 56%;
-  width: clamp(40px, 6vw, 56px);
-  height: clamp(40px, 6vw, 56px);
-  background: #ff4f77;
-  transform: translate(-50%, -50%) rotate(45deg);
-  border-radius: 10px;
-  box-shadow: 0 16px 30px rgba(255, 80, 130, 0.35);
-}
-
-.envelope__heart::before,
-.envelope__heart::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: #ff4f77;
-  border-radius: 50%;
-}
-
-.envelope__heart::before {
-  top: -42%;
-  left: 0;
-}
-
-.envelope__heart::after {
-  left: -42%;
-  top: 0;
-}
-
-/* Breakpoints */
-@media (max-width: 360px) {
-  .giftwall {
-    padding-top: clamp(54px, 7dvh, 78px);
+/* =========================================================
+   Height-only shrinking safety:
+   If viewport is short, reduce title/hint a bit and tighten gaps.
+   This triggers even if width stays fixed.
+   ========================================================= */
+@media (max-height: 700px) {
+  .giftwall__inner {
+    --pad: clamp(10px, 2.2vmin, 24px);
+    --gap: clamp(8px, 1.4vmin, 14px);
   }
 
   .giftwall__title {
-    font-size: clamp(22px, 7.2vw, 34px);
-    margin-bottom: 14px;
+    font-size: clamp(18px, 2.8vmin, 40px);
   }
 
   .giftwall__hint {
-    font-size: clamp(12px, 4.6vw, 16px);
-    margin-top: 14px;
+    font-size: clamp(11px, 1.6vmin, 16px);
+  }
+
+  .giftart {
+    padding: clamp(8px, 1.4vmin, 16px);
   }
 
   .giftcard__tag {
     top: 62%;
-    font-size: 12px;
-    padding: 6px 10px;
-  }
-
-  .giftpage__body {
-    font-size: 14px;
-    line-height: 1.45;
-    max-height: 54dvh;
-  }
-
-  .giftpage {
-    --letter-scale: 1.05;
-  }
-
-  .letter-scene {
-    max-height: 66dvh;
-  }
-
-  .letter-bubbles {
-    left: 140px;
-    max-width: calc(100% - 160px);
-  }
-
-  .polaroid {
-    width: 136px;
-  }
-
-  .polaroid--small {
-    width: 112px;
+    min-height: 40px;
   }
 }
 
-@media (min-width: 361px) and (max-width: 420px) {
-  .giftwall {
-    padding-top: clamp(60px, 6.2dvh, 90px);
-  }
-
-  .giftpage {
-    --letter-scale: 1.15;
-  }
-
-  .giftpage__body {
-    max-height: 56dvh;
-  }
-
-  .letter-bubbles {
-    left: 160px;
-    max-width: calc(100% - 190px);
-  }
-}
-
-@media (min-width: 421px) and (max-width: 600px) {
-  .giftpage {
-    --letter-scale: 1.25;
-  }
-}
-
-@media (min-width: 601px) and (max-width: 900px) {
+/* Ultra short height (landscape phones): force 3 in a row when possible */
+@media (orientation: landscape) and (max-height: 520px) {
   .giftwall__gifts {
-    max-width: 880px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: 1fr;
   }
 
-  .giftpage {
-    --letter-scale: 1.35;
-  }
-}
-
-@media (min-width: 901px) and (max-width: 1200px) {
-  .giftpage {
-    --letter-scale: 1.45;
+  .giftwall__gifts .giftcard:nth-child(3) {
+    grid-column: auto;
+    max-inline-size: unset;
   }
 }
 
-@media (min-width: 1201px) {
+/* Extra tiny widths: keep everything readable */
+@media (max-width: 360px) {
   .giftwall__inner {
-    width: min(1080px, 100%);
+    --pad: 12px;
   }
 
-  .giftwall__gifts {
-    max-width: 920px;
-  }
-}
-
-@media (max-height: 700px) {
-  .giftwall {
-    padding-top: clamp(44px, 7dvh, 72px);
-    padding-bottom: 14px;
-  }
-
-  .giftwall__title {
-    font-size: clamp(20px, 4.8vw, 40px);
-    margin-bottom: 12px;
-  }
-
-  .giftwall__hint {
-    font-size: clamp(12px, 2.8vw, 16px);
-    margin-top: 12px;
-  }
-
-  .giftwall__gifts {
-    gap: 12px;
-    max-height: calc(100dvh - clamp(44px, 7dvh, 72px) - 110px);
-  }
-
-  .giftpage__inner {
-    padding: 14px;
-    max-height: calc(100dvh - clamp(44px, 7dvh, 72px) - 16px);
-  }
-
-  .giftpage__header {
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
-
-  .giftpage__body {
-    padding: 12px;
-    font-size: 14px;
-    line-height: 1.4;
-    max-height: 52dvh;
-  }
-
-  .giftpage {
-    --letter-scale: 1;
-  }
-
-  .letter-scene {
-    padding: 38px 18px 54px;
-    max-height: 62dvh;
-  }
-
-  .letter-polaroids {
-    position: static;
-    margin-bottom: 12px;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    max-width: 100%;
-  }
-
-  .photo-sticker {
-    top: 26px;
-    right: 16px;
-    width: 78px;
-    height: 58px;
-  }
-
-  .letter-paper {
-    padding: 18px 16px 46px;
-  }
-
-  .letter-title {
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-
-  .letter-text {
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  .envelope {
-    height: clamp(120px, 16dvh, 170px);
-    margin-top: -34px;
-  }
-
-  .letter-back {
-    right: 12px;
-    bottom: 12px;
-    padding: 8px 12px;
-  }
-}
-
-@media (max-width: 768px) {
-  .giftwall {
-    padding: clamp(14px, 2dvh, 24px) clamp(12px, 1.5vw, 14px);
-    padding-top: clamp(64px, 4.2dvh, 90px);
-  }
-
-  .giftwall__title {
-    font-size: clamp(28px, 8vw, 40px);
-    margin-bottom: clamp(14px, 1.6dvh, 26px);
-  }
-
-  .giftwall__gifts {
-    gap: clamp(12px, 1.6dvh, 22px);
+  .giftcard {
+    max-inline-size: 360px;
   }
 
   .giftcard__tag {
-    font-size: clamp(12px, 3.2vw, 14px);
-    padding: clamp(7px, 1.2vw, 10px) clamp(12px, 2.2vw, 18px);
-  }
-
-  .giftwall__hint {
-    font-size: clamp(13px, 3.8vw, 17px);
-    margin-top: clamp(14px, 2dvh, 30px);
-  }
-
-  .giftpage__inner {
-    padding: clamp(14px, 2.2vw, 18px);
-  }
-
-  .giftpage__title {
-    font-size: clamp(16px, 3.2vw, 20px);
-  }
-
-  .giftpage__body {
-    font-size: clamp(14px, 2.8vw, 16px);
-  }
-
-  .giftpage__art .giftart {
-    max-width: 100%;
-  }
-
-  .letter-scene {
-    width: min(96vw, 900px);
-    padding: clamp(38px, 4dvh, 52px) clamp(14px, 3vw, 22px) clamp(54px, 6dvh, 78px);
-  }
-
-  .letter-bubbles {
-    left: clamp(120px, 28vw, 180px);
-    max-width: calc(100% - clamp(150px, 34vw, 210px));
-  }
-
-  .letter-polaroids {
-    position: static;
-    margin-bottom: 18px;
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    max-width: 100%;
-  }
-
-  .photo-sticker {
-    top: 40px;
-    right: 24px;
-    width: clamp(72px, 18vw, 90px);
-    height: clamp(56px, 14vw, 70px);
-  }
-
-  .polaroid {
-    width: clamp(126px, 34vw, 150px);
-  }
-
-  .polaroid--small {
-    width: clamp(108px, 28vw, 120px);
-  }
-
-  .letter-envelope {
-    width: min(520px, 96%);
-  }
-
-  .letter-paper {
-    padding: clamp(18px, 2.8dvh, 24px) clamp(14px, 3vw, 20px) clamp(44px, 6dvh, 62px);
-  }
-
-  .letter-title {
-    font-size: clamp(18px, 5.2vw, 22px);
-  }
-
-  .letter-text {
-    font-size: clamp(13px, 3.6vw, 15px);
-  }
-
-  .letter-back {
-    right: 18px;
-    bottom: 18px;
+    font-size: 12px;
+    padding: 7px 12px;
   }
 }
