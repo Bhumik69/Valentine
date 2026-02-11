@@ -1,10 +1,10 @@
 /* =========================================
-   GIFTS CAROUSEL — HARD CLIP + SMART SIZE
+   GIFTS CAROUSEL — HARD CLIP + PERFECT IMAGE FILL
    - ZERO slide peeking
-   - Image fills 100% of slide area
-   - On narrow phones: box shrinks + image shows more (less crop)
-   - On ultra-narrow: image becomes "contain" (no crop)
-   ========================================= */
+   - Image ALWAYS fills 100% (kills global img height:auto)
+   - Card size follows WIDTH (phones get smaller card -> less crop)
+   - Survives width-only and height-only changes
+========================================= */
 
 .cr {
   position: fixed;
@@ -21,51 +21,60 @@
     radial-gradient(700px 500px at 80% 12%, rgba(255,246,250,.75) 0%, rgba(255,246,250,0) 65%),
     radial-gradient(600px 420px at 50% 92%, rgba(255,230,238,.75) 0%, rgba(255,230,238,0) 70%),
     linear-gradient(180deg,#ffe9f0 0%,#fff7ef 55%,#ffeef4 100%);
-
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
 }
 
-/* local reset safety */
-.cr *,
-.cr *::before,
-.cr *::after { box-sizing: border-box; }
-
-.cr img,
-.cr svg,
-.cr video,
-.cr canvas { max-width: 100%; height: auto; display: block; }
+/* Local safety reset ONLY inside carousel */
+.cr,
+.cr * {
+  box-sizing: border-box;
+}
+.cr img {
+  display: block;
+  max-width: 100%;
+}
 
 /* ============ CENTER WRAPPER ============ */
-/* Key change: width controls how tall the box can be (prevents huge crop on narrow phones) */
+/* Make layout stable: stage (flex:1) + actions (auto) */
 .cr__center {
   width: min(960px, 100%);
-  /* ✅ height is now also limited by viewport AND by width (so narrow phones get shorter box) */
-  height: min(86svh, 760px, calc(100vw * 1.25));
-  display: grid;
-  grid-template-rows: 1fr auto;
+  height: min(88svh, 760px);
+
+  display: flex;
+  flex-direction: column;
   gap: clamp(8px, 1.6vmin, 16px);
-  justify-items: center;
 }
 
 /* ============ STAGE ============ */
 .cr__stage {
   position: relative;
-  width: 100%;
-  height: 100%;
+  flex: 1;                 /* take remaining height */
+  min-height: 0;           /* IMPORTANT: allows child to shrink */
+  display: grid;
+  place-items: center;
 }
 
-/* ============ VIEWPORT (HARD CLIP) ============ */
+/* ============ VIEWPORT (HARD CLIP + WIDTH-BASED SIZE) ============ */
+/* Key idea: height is derived from width using aspect-ratio,
+   then capped by available height so it never overflows. */
 .cr__viewport {
   position: relative;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
 
+  /* ✅ This controls cropping on phones:
+     Smaller width => smaller height => image shows better */
+  aspect-ratio: 16 / 10;
+
+  /* ✅ never exceed the stage height */
+  max-height: 100%;
+  height: auto;
+
+  overflow: hidden;
   border-radius: clamp(18px, 2.6vmin, 28px);
   background: rgba(255,255,255,.35);
   backdrop-filter: blur(10px);
 
-  /* Hard stop (prevents any peek / bleed) */
+  /* THIS is the hard stop (no bleed / no peek) */
   contain: layout paint size;
 }
 
@@ -83,8 +92,9 @@
 .cr__track.is-anim {
   transition: transform 420ms cubic-bezier(.2,.85,.2,1);
 }
-
-.cr__track.no-anim { transition: none; }
+.cr__track.no-anim {
+  transition: none;
+}
 
 /* ============ SLIDE ============ */
 .cr__slide {
@@ -101,26 +111,23 @@
   height: 100%;
   overflow: hidden;
 
-  /* inherit viewport roundness */
   border-radius: inherit;
-
-  /* If image is "contain" on small phones, slide color will show behind it nicely */
   display: block;
 }
 
-/* IMAGE */
-.cr__image {
+/* ✅ IMAGE MUST COVER 100% (OVERRIDE GLOBAL img{height:auto}) */
+.cr__card > .cr__image {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
 
-  /* Default: looks premium on normal screens */
+  width: 100% !important;
+  height: 100% !important;      /* kills global height:auto */
+  max-width: none !important;
+  max-height: none !important;
+
   object-fit: cover;
-
-  /* Better crop behavior: keep subject more centered */
-  object-position: center 25%;
+  object-position: center;
+  display: block;
 }
 
 /* overlay */
@@ -128,7 +135,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.30));
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.22));
   pointer-events: none;
 }
 
@@ -137,8 +144,20 @@
   position: absolute;
   inset: auto 0 0 0;
   padding: clamp(12px, 2.2vmin, 20px);
-  color: white;
+  color: #fff;
   text-align: center;
+}
+.cr__cardInner h2 {
+  margin: 0;
+  font-weight: 900;
+  font-size: clamp(16px, 2.8vmin, 24px);
+  text-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+.cr__cardInner p {
+  margin: 8px 0 0 0;
+  font-size: clamp(12px, 2.2vmin, 16px);
+  opacity: 0.95;
+  text-shadow: 0 10px 30px rgba(0,0,0,.35);
 }
 
 /* ============ ARROWS ============ */
@@ -169,6 +188,7 @@
 .cr__arrow span {
   font-size: clamp(28px, 4vmin, 44px);
   font-weight: 700;
+  line-height: 1;
 }
 
 /* ============ ACTIONS ============ */
@@ -176,7 +196,7 @@
   display: flex;
   justify-content: center;
   gap: clamp(10px, 2vmin, 18px);
-  width: 100%;
+  flex-wrap: nowrap;
 }
 
 .cr__btn {
@@ -195,39 +215,49 @@
   box-shadow: 0 14px 30px rgba(0,0,0,.18);
 }
 
-.cr__btn--back { background: rgba(255,255,255,.92); color: #2f1c24; }
-.cr__btn--redeem { background: linear-gradient(135deg,#ff8fb0,#ff5f8d); color: white; }
-.cr__btn--redeem:disabled { opacity: .6; cursor: not-allowed; }
+.cr__btn--back {
+  background: rgba(255,255,255,.92);
+  color: #2f1c24;
+}
 
-/* ============ PHONE FIXES ============ */
-/* Narrow phones: shrink center even more so image isn't over-cropped */
+.cr__btn--redeem {
+  background: linear-gradient(135deg,#ff8fb0,#ff5f8d);
+  color: white;
+}
+
+/* ============ PHONE TUNING (smaller viewport -> less crop) ============ */
 @media (max-width: 420px) {
   .cr__center {
-    height: min(82svh, 640px, calc(100vw * 1.10));
+    height: min(84svh, 620px);
   }
-  .cr__arrow {
-    width: 52px;
-    height: 52px;
+
+  /* Make coupon a bit “shorter” so whole art is more visible */
+  .cr__viewport {
+    aspect-ratio: 16 / 9.5;
   }
-  .cr__arrow span { font-size: 32px; }
 }
 
-/* Ultra-narrow: show FULL image (no crop) */
 @media (max-width: 360px) {
   .cr__center {
-    height: min(80svh, 560px, calc(100vw * 1.00));
+    height: min(82svh, 580px);
   }
-
-  /* ✅ No cropping at all */
-  .cr__image {
-    object-fit: contain;
-    object-position: center center;
+  .cr__viewport {
+    aspect-ratio: 16 / 9.2;
   }
 }
 
-/* ============ HEIGHT SAFETY ============ */
+/* ============ HEIGHT SAFETY (short screens / landscape phones) ============ */
 @media (max-height: 700px) {
   .cr__center {
-    height: min(90svh, 520px, calc(100vw * 1.10));
+    height: min(90svh, 520px);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .cr__center {
+    height: min(92svh, 440px);
+  }
+  .cr__viewport {
+    aspect-ratio: 16 / 8.5; /* landscape: keep it shorter */
   }
 }
