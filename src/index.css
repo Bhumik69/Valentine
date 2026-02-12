@@ -2,10 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* -------------------------------------------------
-   Responsive foundation (works with Tailwind)
-   Goal: make "25% zoom look" become normal at 100%
--------------------------------------------------- */
+/* =====================================================
+   GLOBAL RESPONSIVE FOUNDATION
+===================================================== */
 
 @layer base {
   :root {
@@ -31,15 +30,23 @@
     /* Tap target */
     --tap: 44px;
 
-    /* Safer default radius */
+    /* Border radius */
     --radius-md: 14px;
     --radius-lg: 20px;
   }
 
+  /* Universal box sizing */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
+  }
+
+  /* Critical production fix */
+  html,
+  body,
+  #root {
+    height: 100%;
   }
 
   html,
@@ -83,7 +90,7 @@
     word-break: break-word;
   }
 
-  /* Tap target + consistent fonts */
+  /* Form + button consistency */
   button,
   input,
   textarea,
@@ -103,21 +110,28 @@
   }
 }
 
+/* =====================================================
+   COMPONENT UTILITIES
+===================================================== */
+
 @layer components {
-  /* Reusable fluid container (use: class="container") */
+  /* Reusable fluid container */
   .container {
     width: min(100%, var(--container-max));
     margin-inline: auto;
     padding-inline: var(--container-pad);
   }
 
-  /* Optional: easy vertical section padding */
+  /* Vertical section spacing */
   .section {
     padding-block: var(--space-5);
   }
 }
 
-/* Extra safety: if some element still forces overflow */
+/* =====================================================
+   EXTRA SAFETY FOR SMALL DEVICES
+===================================================== */
+
 @media (max-width: 480px) {
   * {
     max-width: 100%;

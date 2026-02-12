@@ -91,19 +91,13 @@ export default function CarouselRedeem({ onBack }: CarouselRedeemProps) {
 
   return (
     <div className="cr">
-      {/* 🔹 TOP CURSIVE TITLE */}
-      <header className="cr__topTitle cursive-font">
-        My Special Gifts
+      {/* 🔹 TOP TITLE */}
+      <header className="cr__topTitle dancing-script-title">
+        Free Voucher
       </header>
 
+      {/* 🔹 CENTER CONTENT */}
       <div className="cr__center">
-        {/* 🔹 SLIDE TOP LABEL ROW */}
-        <div className="cr__slideHeader">
-          <span>Free Voucher</span>
-          <span>Exclusive</span>
-          <span>Limited</span>
-        </div>
-
         <div className="cr__stage" aria-label="Gift carousel">
           <button
             className="cr__arrow cr__arrow--left"

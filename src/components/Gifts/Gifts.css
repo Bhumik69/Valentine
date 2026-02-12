@@ -6,6 +6,17 @@
    - Survives width-only and height-only changes
 ========================================= */
 
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
+
+/* Dancing Script utility */
+.dancing-script-title {
+  font-family: "Dancing Script", cursive;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+
 .cr {
   position: fixed;
   inset: 0;
