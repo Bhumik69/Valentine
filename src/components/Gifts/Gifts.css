@@ -261,3 +261,169 @@
     aspect-ratio: 16 / 8.5; /* landscape: keep it shorter */
   }
 }
+
+/* =====================================================
+   GLOBAL RESPONSIVE STRUCTURE IMPROVEMENTS
+===================================================== */
+
+/* Ensure safe spacing on all devices */
+.cr {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+}
+
+/* Allow middle section to grow safely */
+.cr__center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(10px, 2vmin, 24px);
+}
+
+/* =====================================================
+   TOP TITLE RESPONSIVENESS
+===================================================== */
+
+.cr__topTitle {
+  text-align: center;
+  padding-top: clamp(14px, 3vmin, 36px);
+  padding-inline: clamp(12px, 4vw, 40px);
+  font-size: clamp(22px, 5vw, 48px);
+  line-height: 1.1;
+}
+
+/* =====================================================
+   SLIDE HEADER (3 ITEMS ROW)
+===================================================== */
+
+.cr__slideHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: clamp(12px, 4vw, 32px);
+  gap: clamp(8px, 2vw, 20px);
+  flex-wrap: wrap;
+  text-align: center;
+  font-size: clamp(11px, 2.5vw, 18px);
+}
+
+/* On very small phones stack neatly */
+@media (max-width: 380px) {
+  .cr__slideHeader {
+    justify-content: center;
+  }
+}
+
+/* =====================================================
+   ACTION BUTTON RESPONSIVENESS
+===================================================== */
+
+.cr__actions {
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 3vw, 28px);
+  flex-wrap: wrap;
+  padding-inline: clamp(10px, 4vw, 30px);
+}
+
+/* Stack buttons on small phones */
+@media (max-width: 480px) {
+  .cr__actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cr__btn {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+/* =====================================================
+   BOTTOM NOTE RESPONSIVENESS
+===================================================== */
+
+.cr__bottomNote {
+  text-align: center;
+  padding: clamp(12px, 3vmin, 28px);
+  font-size: clamp(12px, 2.5vw, 16px);
+  opacity: 0.85;
+}
+
+/* =====================================================
+   LARGE SCREEN OPTIMIZATION
+===================================================== */
+
+@media (min-width: 1440px) {
+  .cr__center {
+    width: min(1100px, 90%);
+  }
+
+  .cr__topTitle {
+    font-size: clamp(40px, 3vw, 60px);
+  }
+
+  .cr__slideHeader {
+    font-size: 18px;
+  }
+}
+
+/* Ultra-wide */
+@media (min-width: 1800px) {
+  .cr__center {
+    width: min(1300px, 85%);
+  }
+}
+
+/* =====================================================
+   TABLET TUNING
+===================================================== */
+
+@media (min-width: 600px) and (max-width: 1024px) {
+  .cr__topTitle {
+    font-size: clamp(28px, 4vw, 42px);
+  }
+
+  .cr__slideHeader {
+    font-size: clamp(14px, 2.2vw, 18px);
+  }
+}
+
+/* =====================================================
+   SHORT HEIGHT DEVICES (Landscape Phones)
+===================================================== */
+
+@media (max-height: 600px) {
+  .cr__topTitle {
+    padding-top: 8px;
+    font-size: clamp(18px, 4vh, 28px);
+  }
+
+  .cr__bottomNote {
+    padding-bottom: 8px;
+    font-size: 12px;
+  }
+}
+
+/* =====================================================
+   VERY SMALL DEVICES (320px width)
+===================================================== */
+
+@media (max-width: 320px) {
+  .cr__topTitle {
+    font-size: 18px;
+  }
+
+  .cr__slideHeader {
+    font-size: 11px;
+  }
+
+  .cr__btn {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+}

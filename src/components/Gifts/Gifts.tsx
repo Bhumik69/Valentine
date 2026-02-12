@@ -69,29 +69,18 @@ export default function CarouselRedeem({ onBack }: CarouselRedeemProps) {
   const isRedeemed = !!redeemedById[currentSlide.id];
 
   const fireConfetti = () => {
-    confetti({
-      particleCount: 160,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-
+    confetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
     setTimeout(() => {
-      confetti({
-        particleCount: 120,
-        spread: 120,
-        origin: { y: 0.4 },
-      });
+      confetti({ particleCount: 120, spread: 120, origin: { y: 0.4 } });
     }, 250);
   };
 
   const redeem = () => {
     if (isRedeemed) return;
-
     setRedeemedById((prev) => ({
       ...prev,
       [currentSlide.id]: true,
     }));
-
     fireConfetti();
   };
 
@@ -102,7 +91,19 @@ export default function CarouselRedeem({ onBack }: CarouselRedeemProps) {
 
   return (
     <div className="cr">
+      {/* 🔹 TOP CURSIVE TITLE */}
+      <header className="cr__topTitle cursive-font">
+        My Special Gifts
+      </header>
+
       <div className="cr__center">
+        {/* 🔹 SLIDE TOP LABEL ROW */}
+        <div className="cr__slideHeader">
+          <span>Free Voucher</span>
+          <span>Exclusive</span>
+          <span>Limited</span>
+        </div>
+
         <div className="cr__stage" aria-label="Gift carousel">
           <button
             className="cr__arrow cr__arrow--left"
@@ -168,6 +169,11 @@ export default function CarouselRedeem({ onBack }: CarouselRedeemProps) {
           </button>
         </div>
       </div>
+
+      {/* 🔹 BOTTOM NOTE */}
+      <footer className="cr__bottomNote">
+        Please send screenshot after redeeming it
+      </footer>
     </div>
   );
 }
